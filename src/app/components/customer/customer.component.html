@@ -1,1 +1,7 @@
-<p>customer works!</p>
+<h2>Liste des utilisateurs</h2>
+
+<ul *ngIf="customers$ | async as customers">
+  <li *ngFor="let customer of customers;">
+    <strong>{{ customer.name }}</strong> - {{ customer.email }}
+  </li>
+</ul>

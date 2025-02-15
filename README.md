@@ -5,8 +5,7 @@
 - Ajouter des packages via npm (utilisation de `package.json`)
 - Créer et utiliser des composants de base
 - Configurer et gérer les routes
-- Créer des services et des modèles et les intégrer avec les composants
-- Implémenter un CRUD avec des données statiques
+- Créer des services et des modèles et les intégrer avec la component customer
 
 ## Concepts de Base
 ### Théorie
@@ -34,6 +33,13 @@ ng generate component NomComposant
 Les routes sont définies dans le fichier `app.routes.ts`.
 - `RouterOutlet` est l'emplacement où les composants seront affichés selon les routes.
 - `RouterLink` remplace `href` et est utilisé pour la navigation entre les pages Angular.
+! tu doit les inclurs dans comp.ts pour les utiliser 
+
+## creer un service et un model 
+- Injectable : 
+- Observable : 
+- OnInit : 
+- CommonModule, NgFor, NgIf : 
 
 ## Exécution de l'Application
 Pour lancer le projet avec un port spécifique :
@@ -46,10 +52,16 @@ ng serve --port 2001
 - **Composants** : Responsables de l'affichage de l'interface utilisateur, chaque composant étant une unité indépendante avec sa propre logique et vue.
 
 ## Résolution de Problèmes
-En cas de problème avec npm, exécutez la commande suivante :
+En cas de problème avec npm:
+- supprimer package-lock.json, node_modules , .angular
+- exécutez les commandes :
+```sh
+npm install 
+```
+
 ```sh
 npm install glob@latest rimraf@latest inflight@latest
 ```
 
-Bon apprentissage d'Angular ! 🚀
+🚀🚀🚀🚀🚀
 
