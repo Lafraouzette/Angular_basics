@@ -1,9 +1,15 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { DataComponent } from './data/data.component';
+import { FooterComponent } from './shared/footer/footer.component';
+import { SideBarreComponent } from './shared/side-barre/side-barre.component';
+import { MainAreaComponent } from './main-area/main-area.component';
+
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, DataComponent],
+  imports: [
+   
+    FooterComponent,
+    SideBarreComponent,
+    MainAreaComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
