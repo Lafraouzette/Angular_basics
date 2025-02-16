@@ -36,11 +36,14 @@ Les routes sont définies dans le fichier `app.routes.ts`.
 ! tu doit les inclurs dans comp.ts pour les utiliser 
 
 ## creer un service et un model 
-- Injectable : 
-- Observable : 
-- OnInit : 
+- Injectable : Décorateur utilisé en Angular pour indiquer qu'un service peut être injecté dans d'autres composants ou services via le système d'injection de dépendances.
+- Observable : Objet qui permet de gérer des flux de données asynchrones (ex : requêtes HTTP, événements utilisateur). Il émet des valeurs au fil du temps et peut être souscrit via .subscribe().
+- OnInit : Interface implémentée dans un composant Angular pour exécuter du code après son initialisation. Elle impose la méthode ngOnInit(), souvent utilisée pour initialiser des données.
 - CommonModule, NgFor, NgIf : 
-
+-- CommonModule : Module Angular qui fournit des directives et fonctionnalités communes (comme NgIf et NgFor).
+-- NgFor : Directive permettant d'afficher une liste en itérant sur un tableau (*ngFor="let item of items").
+-- NgIf : Directive conditionnelle permettant d'afficher ou masquer un élément en fonction d'une condition (*ngIf="condition").
+  
 ## Exécution de l'Application
 Pour lancer le projet avec un port spécifique :
 ```sh
