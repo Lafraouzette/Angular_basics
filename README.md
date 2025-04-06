@@ -1,7 +1,8 @@
-# Apprentissage des Principes d'Angular
+# Angular
 
 ## Objectifs du Projet
-- Comprendre les bases d'Angular et son fonctionnement
+- Comprandre l'architecture
+-  le flux de comminication entre les differants composantes
 - Ajouter des packages via npm (utilisation de `package.json`)
 - Créer et utiliser des composants de base
 - Configurer et gérer les routes
