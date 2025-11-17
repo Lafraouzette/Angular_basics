@@ -1,8 +1,0 @@
-.main-content {
-    min-height: 100vh;
-}
-:host {
-    flex: 1;
-    min-width: 0; 
-    padding: 1rem;
-}
