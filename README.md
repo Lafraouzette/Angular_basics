@@ -55,6 +55,172 @@ ng serve --port 2001
 - **Modules** : Gèrent l'organisation et la structure de l'application, regroupant et configurant différentes parties.
 - **Composants** : Responsables de l'affichage de l'interface utilisateur, chaque composant étant une unité indépendante avec sa propre logique et vue.
 
+## Architecture MVVM dans Angular
+
+### Qu'est-ce que MVVM ?
+MVVM (Model-View-ViewModel) est un pattern architectural qui sépare l'application en trois couches :
+- **Model** : Les données et la logique métier
+- **View** : L'interface utilisateur (template HTML)
+- **ViewModel** : La couche intermédiaire qui expose les données et méthodes à la View
+
+### ⚠️ Important : Dans Angular, le ViewModel EST le Component !
+
+Dans Angular, **pas besoin de fichier `.vm.ts` séparé**. Le fichier `.component.ts` joue déjà le rôle de ViewModel.
+
+### Structure MVVM dans Angular
+
+```
+feature/
+  ├── models/
+  │     └── model.ts           ← MODEL (structure des données)
+  │
+  ├── services/
+  │     └── service.ts         ← Accès au MODEL (API, logique métier)
+  │
+  └── components/
+        └── component-name/
+              ├── component.ts    ← VIEWMODEL (état et logique de présentation)
+              ├── component.html  ← VIEW (interface utilisateur)
+              └── component.css   ← VIEW (styles)
+```
+
+### Exemple Concret : Feature Customer
+
+Voici comment le pattern MVVM est implémenté dans le projet avec le composant `customer` :
+
+#### 1️⃣ **MODEL** - `customer.model.ts`
+Définit la structure des données :
+```typescript
+export interface Customer {
+  id: number;
+  name: string;
+  email: string;
+}
+```
+
+#### 2️⃣ **SERVICE** - `customer.service.ts`
+Gère l'accès aux données (API, logique métier) :
+```typescript
+@Injectable({ providedIn: 'root' })
+export class CustomerService {
+  private customers: Customer[] = [
+    { id: 1, name: 'Alice', email: 'alice@example.com' },
+    { id: 2, name: 'Bob', email: 'bob@example.com' },
+    { id: 3, name: 'Charlie', email: 'charlie@example.com' }
+  ];
+
+  getCustomers(): Observable<Customer[]> {
+    return of(this.customers);
+  }
+}
+```
+
+#### 3️⃣ **VIEWMODEL** - `customer.component.ts`
+Le composant TypeScript = ViewModel. Il contient :
+- L'**état** de la vue (propriétés)
+- La **logique** de présentation (méthodes)
+- La **communication** avec le Model (via le service)
+
+```typescript
+@Component({
+  selector: 'app-customer',
+  standalone: true,
+  imports: [CommonModule, NgFor, NgIf],
+  templateUrl: './customer.component.html',
+  styleUrls: ['./customer.component.css']
+})
+export class CustomerComponent implements OnInit {
+  // ÉTAT de la vue (ViewModel)
+  customers$!: Observable<Customer[]>;
+
+  // Injection du service pour communiquer avec le Model
+  constructor(private customerService: CustomerService) {}
+
+  // Initialisation de l'état
+  ngOnInit(): void {
+    this.customers$ = this.customerService.getCustomers();
+  }
+}
+```
+
+#### 4️⃣ **VIEW** - `customer.component.html`
+L'interface utilisateur qui affiche les données :
+```html
+<h2>Liste des utilisateurs</h2>
+
+<ul *ngIf="customers$ | async as customers">
+  <li *ngFor="let customer of customers;">
+    <strong>{{ customer.name }}</strong> - {{ customer.email }}
+  </li>
+</ul>
+```
+
+### Flux de Communication MVVM
+
+```
+┌─────────────────────────────────────────────────┐
+│  VIEW (customer.component.html)                │
+│  - Affiche les données                          │
+│  - Utilise: {{ customer.name }}                │
+│  - Utilise: *ngFor, *ngIf                       │
+└─────────────────────────────────────────────────┘
+         ↑
+         │ Data Binding (liaison automatique)
+         │
+┌─────────────────────────────────────────────────┐
+│  VIEWMODEL (customer.component.ts)              │
+│  - État: customers$                             │
+│  - Logique: ngOnInit()                          │
+│  - Appelle le Service                           │
+└─────────────────────────────────────────────────┘
+         ↑
+         │ Appel de méthode
+         │
+┌─────────────────────────────────────────────────┐
+│  SERVICE (customer.service.ts)                  │
+│  - getCustomers(): Observable<Customer[]>      │
+│  - Gère l'accès aux données                     │
+└─────────────────────────────────────────────────┘
+         ↑
+         │ Retourne les données
+         │
+┌─────────────────────────────────────────────────┐
+│  MODEL (customer.model.ts)                      │
+│  - Interface Customer                           │
+│  - Structure des données                        │
+└─────────────────────────────────────────────────┘
+```
+
+### Points Clés à Retenir
+
+1. ✅ **Le Component TypeScript = ViewModel** : Pas besoin de fichier `.vm.ts` séparé
+2. ✅ **Le Template HTML = View** : Affiche les données via le data binding
+3. ✅ **Le Service = Accès au Model** : Gère les appels API et la logique métier
+4. ✅ **Le Model = Structure des données** : Interface/Type qui définit les données
+5. ✅ **Change Detection automatique** : Angular met à jour la vue quand l'état change
+
+### Structure Recommandée pour un Nouveau Feature
+
+Pour créer un nouveau feature (ex: `produits`), suivez cette structure :
+
+```
+features/
+  └── produits/
+        ├── models/
+        │     └── produit.model.ts        ← 1️⃣ MODEL
+        │
+        ├── services/
+        │     └── produit.service.ts      ← 2️⃣ SERVICE (API)
+        │
+        └── components/
+              └── produit-list/
+                    ├── produit-list.component.ts    ← 3️⃣ VIEWMODEL
+                    ├── produit-list.component.html  ← VIEW
+                    └── produit-list.component.css   ← VIEW (style)
+```
+
+**C'est tout ! 3 fichiers principaux suffisent : Model, Service, Component (ViewModel + View).**
+
 ## Résolution de Problèmes
 En cas de problème avec npm:
 - supprimer package-lock.json, node_modules , .angular
