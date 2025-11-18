@@ -1,14 +1,15 @@
 import { Routes } from '@angular/router';
 
-import { CustomerComponent } from './components/customer/customer.component';
-import { OrderComponent } from './components/order/order.component';
+import { PostListComponent } from './components/post-list/post-list.component';
 
 export const routes: Routes = [
-  { path: '', 
-    redirectTo: 'customer',
-    pathMatch:'full'
-   },
-    { path: "customer", component:CustomerComponent  },
-  { path: "order", component:OrderComponent  }
-
+  { 
+    path: '', 
+    redirectTo: 'posts',
+    pathMatch: 'full'
+  },
+  { 
+    path: "posts", 
+    component: PostListComponent  // Route pour l'exemple CRUD avec MVVM
+  }
 ];

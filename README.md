@@ -402,6 +402,226 @@ features/
 
 **C'est tout ! 3 fichiers principaux suffisent : Model, Service, Component (ViewModel + View).**
 
+---
+
+### Exemple Pratique : CRUD avec API Gratuite (JSONPlaceholder)
+
+Un exemple complet de CRUD (Create, Read, Update, Delete) avec MVVM a été créé dans le projet pour démontrer l'architecture.
+
+#### 🌐 API Utilisée : JSONPlaceholder
+
+**JSONPlaceholder** est une API REST gratuite et publique, parfaite pour tester et apprendre :
+- **URL** : `https://jsonplaceholder.typicode.com`
+- **Gratuite** : Pas besoin d'authentification
+- **Endpoints CRUD** : GET, POST, PUT, DELETE
+- **Documentation** : https://jsonplaceholder.typicode.com
+
+#### 📁 Structure de l'Exemple
+
+```
+src/app/
+  ├── models/
+  │     └── post.model.ts              ← MODEL (structure Post)
+  │
+  ├── services/
+  │     └── post.service.ts           ← SERVICE (appels API CRUD)
+  │
+  └── components/
+        └── post-list/
+              ├── post-list.component.ts    ← VIEWMODEL (logique CRUD)
+              ├── post-list.component.html  ← VIEW (interface)
+              └── post-list.component.css   ← VIEW (styles)
+```
+
+#### 🔧 Configuration Nécessaire
+
+**1. HttpClient configuré dans `app.config.ts`** :
+```typescript
+import { provideHttpClient } from '@angular/common/http';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // ... autres providers
+    provideHttpClient() // ← Nécessaire pour les appels API
+  ]
+};
+```
+
+**2. Route ajoutée dans `app.routes.ts`** :
+```typescript
+{ path: "posts", component: PostListComponent }
+```
+
+#### 📝 Les 4 Opérations CRUD Implémentées
+
+##### 1️⃣ **CREATE** - Créer un nouveau post
+```typescript
+// Service
+createPost(post: Omit<Post, 'id'>): Observable<Post> {
+  return this.http.post<Post>(this.apiUrl, post);
+}
+
+// ViewModel
+createPost(): void {
+  this.postService.createPost(this.newPost).subscribe({
+    next: (post) => {
+      this.posts.unshift(post); // Ajouter à la liste
+    }
+  });
+}
+```
+
+##### 2️⃣ **READ** - Lire tous les posts
+```typescript
+// Service
+getPosts(): Observable<Post[]> {
+  return this.http.get<Post[]>(this.apiUrl);
+}
+
+// ViewModel
+loadPosts(): void {
+  this.postService.getPosts().subscribe({
+    next: (posts) => {
+      this.posts = posts;
+    }
+  });
+}
+```
+
+##### 3️⃣ **UPDATE** - Mettre à jour un post
+```typescript
+// Service
+updatePost(id: number, post: Partial<Post>): Observable<Post> {
+  return this.http.put<Post>(`${this.apiUrl}/${id}`, post);
+}
+
+// ViewModel
+updatePost(): void {
+  this.postService.updatePost(this.editingPost.id, this.editingPost)
+    .subscribe({
+      next: (updatedPost) => {
+        // Mettre à jour dans la liste
+      }
+    });
+}
+```
+
+##### 4️⃣ **DELETE** - Supprimer un post
+```typescript
+// Service
+deletePost(id: number): Observable<void> {
+  return this.http.delete<void>(`${this.apiUrl}/${id}`);
+}
+
+// ViewModel
+deletePost(id: number): void {
+  this.postService.deletePost(id).subscribe({
+    next: () => {
+      this.posts = this.posts.filter(p => p.id !== id);
+    }
+  });
+}
+```
+
+#### 🎯 Comment Tester l'Exemple
+
+1. **Lancer l'application** :
+   ```sh
+   ng serve --port 2001
+   ```
+
+2. **Accéder à la route** :
+   - Ouvrir : `http://localhost:2001/posts`
+   - Ou ajouter un lien dans la navigation
+
+3. **Tester les opérations CRUD** :
+   - ✅ **READ** : Les posts se chargent automatiquement
+   - ✅ **CREATE** : Cliquer sur "Créer un nouveau post"
+   - ✅ **UPDATE** : Cliquer sur "Modifier" sur un post
+   - ✅ **DELETE** : Cliquer sur "Supprimer" sur un post
+
+#### 🔍 Points MVVM à Observer
+
+1. **Model** (`post.model.ts`) :
+   - Définit la structure `Post`
+   - Pas de logique, juste la structure
+
+2. **Service** (`post.service.ts`) :
+   - Gère tous les appels API
+   - Retourne des Observables
+   - Pas de logique de présentation
+
+3. **ViewModel** (`post-list.component.ts`) :
+   - Gère l'état : `posts[]`, `isLoading`, `error`
+   - Méthodes : `loadPosts()`, `createPost()`, `updatePost()`, `deletePost()`
+   - Communication avec le Service
+
+4. **View** (`post-list.component.html`) :
+   - Utilise le **Data Binding** : `{{ }}`, `[(ngModel)]`, `(click)`
+   - Affiche les données du ViewModel
+   - Écoute les événements utilisateur
+
+#### 📊 Flux MVVM dans l'Exemple CRUD
+
+```
+┌─────────────────────────────────────────┐
+│  VIEW (post-list.component.html)       │
+│  - Bouton "Créer" → (click)="createPost()" │
+│  - Affiche {{ posts }}                  │
+└─────────────────────────────────────────┘
+         ↑
+         │ Event Binding
+         │
+┌─────────────────────────────────────────┐
+│  VIEWMODEL (post-list.component.ts)     │
+│  - createPost() {                       │
+│      this.postService.createPost(...)   │
+│    }                                    │
+└─────────────────────────────────────────┘
+         ↑
+         │ Appel de méthode
+         │
+┌─────────────────────────────────────────┐
+│  SERVICE (post.service.ts)              │
+│  - createPost() → http.post(...)       │
+└─────────────────────────────────────────┘
+         ↑
+         │ Requête HTTP
+         │
+┌─────────────────────────────────────────┐
+│  API (JSONPlaceholder)                  │
+│  - POST /posts                          │
+│  - Retourne le post créé                │
+└─────────────────────────────────────────┘
+```
+
+#### 💡 Autres APIs Gratuites pour CRUD
+
+Si tu veux tester avec d'autres APIs :
+
+1. **ReqRes** : https://reqres.in/
+   - API pour utilisateurs
+   - Endpoints : `/api/users`
+
+2. **Fake Store API** : https://fakestoreapi.com/
+   - API e-commerce
+   - Produits, panier, utilisateurs
+
+3. **JSONPlaceholder** (utilisée ici) : https://jsonplaceholder.typicode.com/
+   - Posts, utilisateurs, commentaires
+   - Parfaite pour les tutoriels
+
+#### ✅ Avantages de cet Exemple
+
+- ✅ **MVVM complet** : Model, View, ViewModel bien séparés
+- ✅ **CRUD complet** : Toutes les opérations implémentées
+- ✅ **Data Binding** : Interpolation, Two-Way Binding, Event Binding
+- ✅ **Gestion d'erreurs** : Affichage des erreurs
+- ✅ **Loading states** : Indicateurs de chargement
+- ✅ **API réelle** : Utilise une vraie API HTTP
+
+**Cet exemple démontre parfaitement comment MVVM facilite le développement d'applications avec API !** 🚀
+
 ## Data Binding dans Angular
 
 ### Qu'est-ce que le Data Binding ?

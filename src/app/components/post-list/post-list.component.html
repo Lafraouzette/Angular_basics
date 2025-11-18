@@ -1,0 +1,105 @@
+<!-- VIEW - Interface utilisateur -->
+<div class="container mt-4">
+  <h2>Gestion des Posts (CRUD avec MVVM)</h2>
+  <p class="text-muted">API utilisée : <a href="https://jsonplaceholder.typicode.com" target="_blank">JSONPlaceholder</a></p>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+
+  <!-- Bouton pour afficher/masquer le formulaire -->
+  <button 
+    class="btn btn-primary mb-3" 
+    (click)="toggleForm()">
+    {{ showForm ? 'Masquer le formulaire' : 'Créer un nouveau post' }}
+  </button>
+
+  <!-- Formulaire de création/édition (Two-Way Binding) -->
+  <div *ngIf="showForm" class="card mb-4">
+    <div class="card-header">
+      <h5>{{ editingPost ? 'Modifier le post' : 'Nouveau post' }}</h5>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="editingPost ? updatePost() : createPost()">
+        <div class="mb-3">
+          <label for="title" class="form-label">Titre</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="title"
+            [(ngModel)]="editingPost ? editingPost.title : newPost.title"
+            name="title"
+            required>
+        </div>
+        
+        <div class="mb-3">
+          <label for="body" class="form-label">Contenu</label>
+          <textarea 
+            class="form-control" 
+            id="body" 
+            rows="4"
+            [(ngModel)]="editingPost ? editingPost.body : newPost.body"
+            name="body"
+            required></textarea>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button 
+            type="submit" 
+            class="btn btn-success"
+            [disabled]="isLoading">
+            {{ editingPost ? 'Mettre à jour' : 'Créer' }}
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="cancelEdit()">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="isLoading" class="text-center my-4">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <!-- Liste des posts -->
+  <div *ngIf="!isLoading" class="row">
+    <div *ngFor="let post of posts" class="col-md-6 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ post.title }}</h5>
+          <p class="card-text">{{ post.body }}</p>
+          <div class="d-flex gap-2">
+            <!-- Event Binding pour les actions -->
+            <button 
+              class="btn btn-sm btn-warning"
+              (click)="startEdit(post)">
+              Modifier
+            </button>
+            <button 
+              class="btn btn-sm btn-danger"
+              (click)="deletePost(post.id)">
+              Supprimer
+            </button>
+          </div>
+          <small class="text-muted d-block mt-2">
+            Post ID: {{ post.id }} | User ID: {{ post.userId }}
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message si aucun post -->
+  <div *ngIf="!isLoading && posts.length === 0" class="alert alert-info">
+    Aucun post disponible.
+  </div>
+</div>
+
